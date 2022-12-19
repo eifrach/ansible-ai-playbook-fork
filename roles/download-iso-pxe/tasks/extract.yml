@@ -1,9 +1,4 @@
 
-- name: set Assisted-installer URL v2
-  set_fact:
-    API_URL: "{{ URL }}/api/assisted-install/v2"
-  tags: extract
-
 - name: Extract files from a ISO to TFTP
   iso_extract:
     image:  "{{ WORKDIR }}/{{ ISO_NAME }}"
@@ -78,18 +73,6 @@
   become: true
   tags: extract
 
-- name: Get infra-env id by cluster id
-  uri:
-    url: "{{ API_URL }}/infra-envs?cluster_id={{ CLUSTER_ID  }}"
-    method: GET
-    headers: 
-      Accept: application/json
-      Content-Type: application/json
-    follow_redirects: all
-    return_content: yes
-    status_code: "200"
-  register: _infraenv_result
-  tags: extract
 
 - name: "[ full-iso ] Extract rootfs.img from a ISO"
   iso_extract:
@@ -98,7 +81,7 @@
     files:
     - images/pxeboot/rootfs.img
   become: yes
-  when: _infraenv_result.json[0] | json_query('type') == "full-iso"
+  when:  _infraenv_result.json[0] | json_query('type')ISO_TYPE == "full-iso"
   tags: extract
 
 
@@ -107,7 +90,7 @@
     URL=$(cat {{ WORKDIR }}/isolinux.cfg  | grep -o 'coreos.live.rootfs_url=.*' | cut -f2- -d"=")
     curl $URL --output  {{ HTTP_DIR }}/rootfs.img
     rm -f {{ WORKDIR  }}/isolinux.cfg
-  when: _infraenv_result.json[0] | json_query('type') == "minimal-iso"
+  when: ISO_TYPE == "minimal-iso"
   become: yes
   tags: extract
 
