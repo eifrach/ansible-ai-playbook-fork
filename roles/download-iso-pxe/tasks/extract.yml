@@ -24,7 +24,7 @@
   file:
     path: "{{ MNT_EFIBOOT }}"
     state: directory
-    owner: root
+    owner: roothttps://github.com/eifrach/ansible-ai-playbook-fork/compare/main...extract-changes
     group: root
   become: yes
   tags: extract
@@ -81,7 +81,7 @@
     files:
     - images/pxeboot/rootfs.img
   become: yes
-  when:  _infraenv_result.json[0] | json_query('type')ISO_TYPE == "full-iso"
+  when: ISO_TYPE == "full-iso"
   tags: extract
 
 
@@ -99,14 +99,14 @@
     CONFIG={{ HTTP_DIR }}/config.ign
     echo '{' >  $CONFIG
     zcat  {{ WORKDIR }}/ignition.img | sed '1d; $d'  >>  $CONFIG
-    echo '}' >> $CONFIG
+    echo '}' >> $CONFIG_infraenv_result.json[0] | json_query('type')
     chown -R apache: {{ HTTP_DIR }}/
     rm -rf {{ WORKDIR }}/ignition.img
   become: yes
   tags: extract
 
 - name: Create grub.cfg
-  template:
+  template:_infraenv_result.json[0] | json_query('type')
     src: grub.cfg.j2
     dest: "{{ TFTP_DIR }}/grub.cfg"
   become: yes
